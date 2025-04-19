@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match the Magic</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fdf6ef;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      min-height: 100vh;
+    }
+
+    a {
+      align-self: flex-start;
+      margin: 20px;
+      font-weight: bold;
+      color: #2c3e50;
+      text-decoration: none;
+    }
+
+    h1 {
+      margin-top: 10px;
+      color: #2c3e50;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .card {
+      width: 80px;
+      height: 80px;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .card.matched {
+      background-color: #bfe6c0;
+      cursor: default;
+    }
+
+    #message {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      color: #2c3e50;
+      display: none;
+      text-align: center;
+    }
+
+    #play-again {
+      display: none;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #1e2a38;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #play-again:hover {
+      background-color: #3b4f6b;
+    }
+  </style>
+</head>
+<body>
+  <a href="scratch.html">← Back to MaddyAnnFilms</a>
+  <h1>Match the Magic</h1>
+  <p class="instructions">Click two cards to flip them. If they match, they stay revealed. Match all the pairs to win!</p>
+  <div class="game-board" id="gameBoard"></div>
+  <div id="message">You matched all the cards! 🎉</div>
+  <button id="play-again">Play Again</button>
+
+  <script>
+  const emojis = ['🎥', '📷', '🎞️', '🎬', '💍', '💒', '📸', '👰‍♀️'];
+    let cards = [...emojis, ...emojis];
+    let flipped = [];
+    let matched = 0;
+
+    const gameBoard = document.getElementById('gameBoard');
+    const message = document.getElementById('message');
+    const playAgainBtn = document.getElementById('play-again');
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function createBoard() {
+      gameBoard.innerHTML = '';
+      cards = shuffle(cards);
+      cards.forEach(emoji => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.setAttribute('data-emoji', emoji);
+        card.innerText = '';
+        card.addEventListener('click', flipCard);
+        gameBoard.appendChild(card);
+      });
+    }
+
+    function flipCard() {
+      if (this.classList.contains('matched') || flipped.includes(this)) return;
+      if (flipped.length === 2) return;
+
+      this.innerText = this.getAttribute('data-emoji');
+      flipped.push(this);
+
+      if (flipped.length === 2) {
+        const [first, second] = flipped;
+        if (first.getAttribute('data-emoji') === second.getAttribute('data-emoji')) {
+          first.classList.add('matched');
+          second.classList.add('matched');
+          matched += 2;
+          flipped = [];
+
+          if (matched === cards.length) {
+            message.style.display = 'block';
+            playAgainBtn.style.display = 'inline-block';
+          }
+        } else {
+          setTimeout(() => {
+            first.innerText = '';
+            second.innerText = '';
+            flipped = [];
+          }, 800);
+        }
+      }
+    }
+
+    playAgainBtn.addEventListener('click', () => {
+      matched = 0;
+      flipped = [];
+      message.style.display = 'none';
+      playAgainBtn.style.display = 'none';
+      createBoard();
+    });
+
+    createBoard();
+  </script>
+</body>
+</html>
